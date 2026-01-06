@@ -12,7 +12,7 @@ function App() {
     }
   })
   return (
-    <div className="flex w-screen ">
+    <div className="flex w-screen divide-x ">
         { columns.map((column)=>
         (
            <div className="flex-1" >
