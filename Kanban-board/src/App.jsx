@@ -1,10 +1,18 @@
 import { useState } from "react";
 import TaskCard from "./components/TaskCard"
 import { tasks as initialTasks, statuses } from './data/task-data'
+import { useEffect } from "react";
 
 function App() {
 
-  const [ tasks, setTasks ] = useState(initialTasks); 
+  const [ tasks, setTasks ] = useState(()=>{
+    const saved = localStorage.getItem("tasks");
+    return saved ? JSON.parse(saved) : initialTasks;
+  }); 
+
+  useEffect(()=>{
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+  },[tasks])
   const columns = statuses.map((status)=>
   { 
     const tasksInColumn = tasks.filter((task)=>task.status === status);
@@ -13,14 +21,18 @@ function App() {
       tasks: tasksInColumn
     }
   })
-  const updatedTaskPoints = ((tasktoupdate,newpoints)=>{
-    if(newpoints < 0)
+  const updatedTaskPoints = ((tasktoupdate,direction)=>{
+    if(tasktoupdate.points < 0 || tasktoupdate.points > 13)
     return;
+
+    const fib = [0,1,2,3,5,8,13];
+    const index = fib.indexOf(tasktoupdate.points);
+    const newIndex = direction === 'up' ? index+1 : index-1;
       setTasks((prev)=>
           prev.map((task)=>
             task.id === tasktoupdate.id?
             {
-              ...task, points : newpoints
+              ...task, points : fib[newIndex] || 0
             }
           : task
           )
@@ -28,6 +40,19 @@ function App() {
     
   }
   )
+
+  const updateTaskTitle = (tasktoupdate, newTitle)=>{
+    setTasks((prev)=>
+      prev.map((task)=>
+        task.id === tasktoupdate.id?
+        {
+          ...task, title: newTitle
+        }
+        : task
+      )
+    )
+
+  }
   return (
     <div className="flex w-screen divide-x ">
         { columns.map((column)=>
@@ -40,7 +65,7 @@ function App() {
             <div>
               {column.tasks.map((task)=>
            (
-            <TaskCard task={task} updateTaskPoints={updatedTaskPoints} />
+            <TaskCard task={task} updateTaskPoints={updatedTaskPoints} updateTaskTitle={updateTaskTitle} />
            ))}
             </div>
            </div>
