@@ -51,13 +51,29 @@ function App() {
         : task
       )
     )
-
   }
+  
+    const handleDrop = (e,newStatus)=>
+    {
+        const id = e.dataTransfer.getData("id");
+        setTasks((prev)=>
+        prev.map((task)=>
+          task.id === id?
+          {
+            ...task, status: newStatus
+          }
+          : task
+        )
+        )
+    }
   return (
     <div className="flex w-screen divide-x ">
         { columns.map((column)=>
         (
-           <div className="flex-1" >
+           <div className="flex-1" 
+           onDragOver={(e)=>e.preventDefault()}
+           onDrop={(e)=>handleDrop(e,column.status)}
+           >
             <div className="flex justify-between text-3xl font-bold items-center mr-2" >  
             <h1 className="text-center font-bold p-4 uppercase text-2xl"  >{column.status}</h1>
             <h6>{column.tasks.reduce((sum,task)=>sum+task.points,0)}</h6>
