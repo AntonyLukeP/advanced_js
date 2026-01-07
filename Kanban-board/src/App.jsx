@@ -52,7 +52,7 @@ function App() {
       )
     )
   }
-  
+    // change status when dropped
     const handleDrop = (e,newStatus)=>
     {
         const id = e.dataTransfer.getData("id");
