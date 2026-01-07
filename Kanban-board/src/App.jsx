@@ -1,18 +1,17 @@
 import { useState } from "react";
 import TaskCard from "./components/TaskCard"
-import { tasks as initialTasks, statuses } from './data/task-data'
+import { statuses } from './data/task-data'
 import { useEffect } from "react";
 
 function App() {
 
-  const [ tasks, setTasks ] = useState(()=>{
-    const saved = localStorage.getItem("tasks");
-    return saved ? JSON.parse(saved) : initialTasks;
-  }); 
+  const [ tasks, setTasks ] = useState([]); 
+
 
   useEffect(()=>{
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-  },[tasks])
+    fetch("http://localhost:3001/tasks").then(res => res.json()).then(data=> setTasks(data)).catch(err => console.log("Failed to fetch tasks",err))
+  },[])
+
   const columns = statuses.map((status)=>
   { 
     const tasksInColumn = tasks.filter((task)=>task.status === status);
@@ -37,6 +36,12 @@ function App() {
           : task
           )
       )
+
+      fetch(`http://localhost:3001/tasks/${tasktoupdate.id}`,{
+        method: 'PATCH',
+        headers:{"Content-Type":"application-json"},
+        body: JSON.stringify({points: fib[newIndex] || 0})
+      })
     
   }
   )
@@ -51,6 +56,12 @@ function App() {
         : task
       )
     )
+
+    fetch(`http://localhost:3001/tasks/${tasktoupdate.id}`,{
+      method: 'PATCH',
+      headers:{"Content-Type":"application-json"},
+      body: JSON.stringify({title: newTitle})
+    })
   }
     // change status when dropped
     const handleDrop = (e,newStatus)=>
