@@ -55,6 +55,7 @@ function App() {
     // change status when dropped
     const handleDrop = (e,newStatus)=>
     {
+      setCurrentlyHoveringOver(null);
         const id = e.dataTransfer.getData("id");
         setTasks((prev)=>
         prev.map((task)=>
@@ -66,19 +67,27 @@ function App() {
         )
         )
     }
+
+    const [currentlyHoveringOver,setCurrentlyHoveringOver] = useState(null);
+    const handleDragEnter = (e, status)=>{
+      e.preventDefault();
+      setCurrentlyHoveringOver(status);
+    }
+
   return (
-    <div className="flex w-screen divide-x ">
+    <div className="flex w-full divide-x ">
         { columns.map((column)=>
         (
            <div className="flex-1" 
            onDragOver={(e)=>e.preventDefault()}
            onDrop={(e)=>handleDrop(e,column.status)}
+           onDragEnter={(e)=>handleDragEnter(e,column.status)}
            >
             <div className="flex justify-between text-3xl font-bold items-center mr-2" >  
             <h1 className="text-center font-bold p-4 uppercase text-2xl"  >{column.status}</h1>
             <h6>{column.tasks.reduce((sum,task)=>sum+task.points,0)}</h6>
             </div>
-            <div>
+            <div className={`h-[calc(100vh-80px)] overflow-y-auto ${currentlyHoveringOver === column.status?"bg-gray-100":""}`}>
               {column.tasks.map((task)=>
            (
             <TaskCard task={task} updateTaskPoints={updatedTaskPoints} updateTaskTitle={updateTaskTitle} />
