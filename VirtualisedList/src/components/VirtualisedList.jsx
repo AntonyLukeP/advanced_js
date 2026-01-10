@@ -1,21 +1,24 @@
-import React, { useState } from 'react'
+import { useVirtualScroll } from '../hooks/useVirtualScroll';
 
 const itemHeight = 40;
-const veiwportHeight = 400;
+const viewportHeight = 400;
 
 const VirtualisedList = ({items}) => {
 
-    const [scrollTop, setScrollTop] = useState(0);
-
-    const startIndex = Math.floor(scrollTop/itemHeight);
-    const visibleItemCount = Math.ceil(veiwportHeight/itemHeight)+2;
+    const {
+    startIndex,
+    visibleItemCount,
+    paddingTop,
+    paddingBottom,
+    onScroll,
+  } = useVirtualScroll({
+    itemCount: items.length,
+    itemHeight,
+    viewportHeight,
+  });
+   
 
     const visibleItems = items.slice(startIndex, startIndex+visibleItemCount);
-
-    
-    const paddingTop = startIndex * itemHeight;
-    const paddingBottom =
-        (items.length - (startIndex + visibleItemCount)) * itemHeight;
 
   return (
     <div
@@ -24,7 +27,7 @@ const VirtualisedList = ({items}) => {
 
         <div className=' h-[400px] w-[400px] overflow-y-auto border-4
          border-gray-500 rounded-2xl' 
-        onScroll={(e)=>setScrollTop(e.target.scrollTop)} 
+        onScroll={onScroll} 
         >
             
         <div
